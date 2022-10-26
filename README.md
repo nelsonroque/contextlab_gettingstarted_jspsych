@@ -1,6 +1,16 @@
 # Context Lab: Getting Started with JsPsych
  A repository with materials to get started creating JsPsych experiments.
 
+## Why use JsPsych?
+Simple answer: don't repeat yourself (DRY) when you code. JsPsych, like other programming frameworks, have sets of boilerplate code that make it easy to get started programming an experience, without having to 'reinvent the wheel'.
+
+## Are there alternatives to JsPsych?
+
+Plenty! A few options are listed below:
+- [PsychoJS](https://www.psychopy.org/online/psychojsCode.html)
+- [Lab.js](https://lab.js.org/)
+- [Experiment.js](http://longouyang.github.io/even-odd/docs/experiment.html)
+
 ## Overview
 
 This repository is comprised of:
