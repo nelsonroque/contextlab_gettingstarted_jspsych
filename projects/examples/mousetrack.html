@@ -22,7 +22,10 @@
   var jsPsych = initJsPsych({
     extensions: [
       { type: jsPsychExtensionMouseTracking, params: { minimum_sample_time: 0 } }
-    ]
+    ],
+    on_finish: function () {
+            jsPsych.data.displayData("csv");
+        }
   });
 
   var show_data = {
