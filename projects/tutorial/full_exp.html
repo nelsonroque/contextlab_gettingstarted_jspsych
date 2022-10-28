@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Little bit of everything Tutorial | Context Lab</title>
+    <script src="../../dist/jspsych.js"></script>
+    <script src="../../dist/plugin-html-keyboard-response.js"></script>
+    <script src="../../dist/plugin-html-button-response.js"></script>
+    <script src="../../dist/plugin-image-keyboard-response.js"></script>
+    <script src="../../dist/plugin-instructions.js"></script>
+    <script src="../../dist/plugin-preload.js"></script>
+    <script src="../../dist/plugin-sketchpad.js"></script>
+    <script src="../../dist/plugin-survey.js"></script>
+    <script src="../../dist/plugin-survey-text.js"></script>
+    <script src="../../dist/plugin-virtual-chinrest.js"></script>
+    <script src="../../dist/plugin-reconstruction.js"></script>
+    <link href="../../dist/jspsych.css" rel="stylesheet" type="text/css" />
+    <script src="../../utils.js"></script>
+
+    <!-- Custom styling to enhance readability -->
+    <link href="../../app.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body></body>
+<script>
+    // ----------------------------------------------------------------
+    // PARAMETERS
+    // ----------------------------------------------------------------
+
+    // set timing parameters
+    var post_trial_gap = 1200;
+
+    // specify instruction image size
+    var box_width = 120;
+    var box_height = 120;
+
+    // number of blocks
+    n_block_reps = 1;
+
+    // ----------------------------------------------------------------
+    // JSPSYCH INITIALIZATION
+    // ----------------------------------------------------------------
+
+    /* initialize jsPsych */
+    var jsPsych = initJsPsych({
+
+        // what should happen when the experiment is finished?
+        on_finish: function () {
+            jsPsych.data.displayData("csv");
+        }
+    });
+
+    /* create timeline */
+    var timeline = [];
+
+    /* define instructions trial */
+    var instructions = {
+        type: jsPsychInstructions,
+        pages: ["Welcome to the Color experiment.",
+            "You will first be asked to pay attention to a color and report the color after a delay.",
+            "You will then be asked to report the color of a word.",
+            "Finally, you will be asked to draw any animal in 30 seconds and report the animal drawn.",
+            "Press any key to begin."],
+        button_label_next: "Continue",
+        button_label_previous: "Previous",
+        show_clickable_nav: true,
+        post_trial_gap: post_trial_gap
+    };
+    timeline.push(instructions);
+
+    var init_color = {
+        type: jsPsychHtmlKeyboardResponse,
+        stimulus: jsPsych.timelineVariable('stimulus'),
+        choices: "NO_KEYS",
+        trial_duration: 500,
+        post_trial_gap: function () {
+      return jsPsych.randomization.sampleWithoutReplacement([500,1000,1500,2000,2500,3000], 1)[0];
+    },
+        // post_trial_gap: 4000
+    };
+
+    var test = {
+        type: jsPsychHtmlButtonResponse,
+        stimulus: '',
+        choices: [`<div style="background-color:red; width:${box_width}px; height:${box_height}px;"></div>`,
+        `<div style="background-color:#dc0000; width:${box_width}px; height:${box_height}px;"></div>`,
+        `<div style="background-color:#ab0000; width:${box_width}px; height:${box_height}px;"></div>`
+        ],
+        prompt: "<p>What color did you see?</p>"
+    };
+
+    /* define test procedure */
+    var test_stimuli = [
+        { stimulus: '<div style="background-color:red; width:300px; height:300px;"></div>' },
+        { stimulus: '<div style="background-color:#dc0000; width:300px; height:300px;"></div>' },
+        { stimulus: '<div style="background-color:#ab0000; width:300px; height:300px;"></div>' }
+    ]
+    var test_procedure = {
+        timeline: [init_color, test],
+        timeline_variables: test_stimuli,
+        repetitions: n_block_reps,
+        randomize_order: true
+    };
+    timeline.push(test_procedure);
+
+    var stroop_trial = {
+        type: jsPsychHtmlButtonResponse,
+        stimulus: '<p style="font-size:48px; color:red;">GREEN</p>',
+        choices: ['Red', 'Green', 'Blue'],
+        prompt: "<p>What color is the `ink`?</p>"
+    };
+    timeline.push(stroop_trial);
+
+    // define a part of the experiment that allows the user to draw a sketch
+    var draw = {
+        type: jsPsychSketchpad,
+        prompt: '<p>Draw the first animal that comes to mind. You have 30 seconds!</p>',
+        prompt_location: 'belowcanvas',
+        trial_duration: 30000,
+        show_countdown_trial_duration: true,
+    }
+    timeline.push(draw);
+
+    // define a part of the experiment that allows the user to label the sketch
+    var label = {
+        type: jsPsychSurveyText,
+        preamble: () => {
+            var imageData = jsPsych.data.get().last(1).values()[0].png;
+            return `<img src="${imageData}"></img>`;
+        },
+        questions: [
+            { prompt: 'What animal did you draw?' }
+        ]
+    }
+    timeline.push(label);
+
+    var sample_function = function (param) {
+        var size = 50 + Math.floor(param * 250);
+        var html = '<div style="display: block; margin: auto; height: 300px; width: 300px; position: relative;">' +
+            '<div style="display: block; position: absolute; top: ' + (150 - size / 2) + 'px; left:' + (150 - size / 2) + 'px; background-color: #000000; ' +
+            'width: ' + size + 'px; height: ' + size + 'px;"></div></div><p>Press "h" to make the square larger. Press "g" to make the square smaller.</p>' +
+            '<p>When the square is the same size as the previous one, click Continue.</p>';
+        return html;
+    }
+
+    var match_item = {
+        type: jsPsychHtmlKeyboardResponse,
+        stimulus: '<div style="display: block; margin: auto; height: 300px; width: 300px; position: relative;">' +
+            '<div style="display: block; position: absolute; top: ' + (150 - 210 / 2) + 'px; left:' + (150 - 210 / 2) + 'px; background-color: #000000; ' +
+            'width: 210px; height: 210px;"></div></div>',
+        choices: ['c'],
+        post_trial_gap: 1250,
+        prompt: '<p>Study the size of this square carefully. On the next screen you will have to recreate it. When you are ready, press "c".</p>'
+    }
+    timeline.push(match_item);
+
+    var reconstruction = {
+        type: jsPsychReconstruction,
+        stim_function: sample_function,
+        starting_value: 0.5,
+    }
+    timeline.push(reconstruction);
+
+//     var vc_trial = {
+//         type: jsPsychVirtualChinrest,
+//         blindspot_reps: 3,
+//         resize_units: "deg",
+//         pixels_per_unit: 50
+//     };
+//     timeline.push(vc_trial);
+
+//     var resized_stimulus = {
+//         type: jsPsychHtmlButtonResponse,
+//         stimulus: `
+//     <p>If the measurements were done correctly, the square below should take up about 10 degrees of visual angle.</p>
+//     <div style="background-color: black; width: 500px; height: 500px; margin: 20px auto;"></div>
+//   `,
+//         choices: ['Continue']
+//     }
+//     timeline.push(resized_stimulus);
+
+    /* start the experiment */
+    jsPsych.run(timeline);
+
+</script>
+
+</html>
