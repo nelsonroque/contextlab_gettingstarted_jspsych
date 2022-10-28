@@ -85,7 +85,7 @@
     fixation_image: 'img/fixation.png',
     target_present_key: 'e',
     target_absent_key: 'n',
-    target_present: true,
+    target_present: false,
     fixation_size: [50,50],
     target_size: [60,60],
     circle_diameter: 300
@@ -109,7 +109,7 @@
     fixation_image: 'img/fixation.png',
     target_present_key: 'e',
     target_absent_key: 'n',
-    target_present: true,
+    target_present: false,
     fixation_size: [50,50],
     target_size: [60,60],
     circle_diameter: 600
@@ -128,7 +128,7 @@
     type: jsPsychHtmlKeyboardResponse,
     stimulus: function () {
 
-      var trials = jsPsych.data.get().filter({ task: 'response' });
+      var trials = jsPsych.data.get().filter({ trial_type: "visual-search-circle" });
       var correct_trials = trials.filter({ correct: true });
       var accuracy = Math.round(correct_trials.count() / trials.count() * 100);
       var rt = Math.round(correct_trials.select('rt').mean());
