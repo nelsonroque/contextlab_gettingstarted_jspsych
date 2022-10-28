@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Surveys | Context Lab</title>
+    <script src="../../dist/jspsych.js"></script>
+    <script src="../../dist/plugin-instructions.js"></script>
+    <script src="../../dist/plugin-survey.js"></script>
+    <script src="../../dist/plugin-survey-html-form.js"></script>
+    <script src="../../dist/plugin-survey-likert.js"></script>
+    <script src="../../dist/plugin-survey-multi-choice.js"></script>
+    <script src="../../dist/plugin-survey-multi-select.js"></script>
+    <script src="../../dist/plugin-survey-text.js"></script>
+    <link href="../../dist/jspsych.css" rel="stylesheet" type="text/css" />
+    <script src="../../utils.js"></script>
+
+    <!-- Custom styling to enhance readability -->
+    <link href="../../app.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body></body>
+<script>
+
+    /* initialize jsPsych */
+    var jsPsych = initJsPsych({
+        on_finish: function () {
+            jsPsych.data.displayData("csv");
+        }
+    });
+
+    /* create timeline */
+    var timeline = [];
+
+    /* define instructions trial */
+    var instructions = {
+        type: jsPsychInstructions,
+        pages: ["Welcome to a demo of JsPsych survey functionality. Press any key to begin."],
+        button_label_next: "Continue",
+        button_label_previous: "Previous",
+        show_clickable_nav: true,
+    };
+    timeline.push(instructions);
+
+    var trial = {
+        type: jsPsychSurvey,
+        pages: [
+            [
+                {
+                    type: 'text',
+                    prompt: "Where were you born?",
+                    placeholder: 'City, State, Country',
+                    name: 'birthplace',
+                    required: true,
+                },
+                {
+                    type: 'text',
+                    prompt: "How old are you?",
+                    name: 'age',
+                    textbox_columns: 5,
+                    required: false,
+                }
+            ],
+            [
+                {
+                    type: 'multi-choice',
+                    prompt: "What's your favorite color?",
+                    options: ['blue', 'yellow', 'pink', 'teal', 'orange', 'lime green', 'other', 'none of these'],
+                    name: 'FavColor',
+                },
+                {
+                    type: 'multi-select',
+                    prompt: "Which of these animals do you like? Select all that apply.",
+                    options: ['lion', 'squirrel', 'badger', 'whale'],
+                    option_reorder: 'random',
+                    columns: 0,
+                    name: 'AnimalLike',
+                }
+            ]
+        ],
+        title: 'My questionnaire',
+        button_label_next: 'Continue',
+        button_label_back: 'Previous',
+        button_label_finish: 'Submit',
+        show_question_numbers: 'onPage'
+    };
+
+    timeline.push(trial);
+
+    const scored_trial = {
+        type: jsPsychSurvey,
+        pages: [
+            [
+                {
+                    type: 'multi-choice',
+                    prompt: 'The sum of 234 and 345 is: ', // 234+345=579
+                    options: ["579", "578", "577", "576"],
+                    correct_response: "579",
+                    required: true
+                },
+            ]
+        ],
+    };
+    timeline.push(scored_trial);
+
+    var likert_scale = [
+        "Strongly Disagree",
+        "Disagree",
+        "Neutral",
+        "Agree",
+        "Strongly Agree"
+    ];
+
+    var likert_trial = {
+        type: jsPsychSurveyLikert,
+        questions: [
+            { prompt: "I like vegetables.", name: 'Vegetables', labels: likert_scale },
+            { prompt: "I like fruit.", name: 'Fruit', labels: likert_scale },
+            { prompt: "I like candy.", name: 'Candy', labels: likert_scale },
+            { prompt: "I like chocolate.", name: 'Chocolate', labels: likert_scale },
+        ],
+        randomize_question_order: true
+    };
+    timeline.push(likert_trial);
+
+    /* start the experiment */
+    jsPsych.run(timeline);
+
+</script>
+
+</html>

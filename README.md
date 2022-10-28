@@ -23,7 +23,7 @@ To demo any of the tasks in either the `examples` or `tutorials` folder, simply 
 
 - with JsPsych library on CDN
     - Pros: easy to get started
-    - Cons: relient on external service (that may go down, upgrade versions)
+    - Cons: relient on external service (may be slow or go down, upgrades making breaking changes)
 - with JsPsych library embedded into your project. 
     - Pros: full control over upgrades, special edits required
     - Cons: relient on remembering to update the library (and likely related code)

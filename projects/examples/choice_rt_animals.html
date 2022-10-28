@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Choice RT Experiment | Context Lab</title>
+  <script src="../../dist/jspsych.js"></script>
+  <script src="../../dist/plugin-html-keyboard-response.js"></script>
+  <script src="../../dist/plugin-image-keyboard-response.js"></script>
+  <script src="../../dist/plugin-instructions.js"></script>
+  <script src="../../dist/plugin-preload.js"></script>
+  <link href="../../dist/jspsych.css" rel="stylesheet" type="text/css" />
+  <script src="../../utils.js"></script>
+
+  <!-- Custom styling to enhance readability -->
+  <link href="../../app.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body></body>
+<script>
+
+  // set image for each key
+  var left_key_img = "img/cat.png";
+  var right_key_img = "img/tyrannosaurus-rex.png";
+
+  var left_key_identity = "cat";
+  var right_key_identity = "tyrannosaurus-rex";
+
+  // set timing parameters
+  var post_trial_gap = 1200;
+
+  // specify instruction image size
+  var img_width = 120;
+  var img_height = 120;
+
+  // number of blocks
+  n_block_reps = 3;
+
+  /* initialize jsPsych */
+  var jsPsych = initJsPsych({
+    on_finish: function () {
+      jsPsych.data.displayData("csv");
+    }
+  });
+
+  /* create timeline */
+  var timeline = [];
+
+  /* preload images */
+  var preload = {
+    type: jsPsychPreload,
+    images: ['img/cat.png', 'img/tyrannosaurus-rex.png']
+  };
+  timeline.push(preload);
+
+  /* define instructions trial */
+  var instructions = {
+    type: jsPsychInstructions,
+    pages: ["Welcome to the Choice RT experiment. Press any key to begin.",
+      `<p>In this experiment, an image will appear in the center 
+        of the screen.</p>`,
+      `<p>If the image is a <strong>${left_key_identity}</strong>, 
+          press the letter F on the keyboard as fast as you can.</p>
+        <p>If the image is a <strong>${right_key_identity}</strong>, 
+          press the letter J as fast as you can.</p>
+        <div style='width: 700px;'>
+        <div style='float: left;'><img src='${left_key_img}'  width=${img_width}px height=${img_height}px></img>
+        <p class='small'><strong>Press the F key</strong></p></div>
+        <div style='float: right;'><img src='${right_key_img}'  width=${img_width}px height=${img_height}px></img>
+        <p class='small'><strong>Press the J key</strong></p></div>
+        </div>
+        <p>Press any key to begin.</p>
+      `],
+    button_label_next: "Continue",
+    button_label_previous: "Previous",
+    show_clickable_nav: true,
+    post_trial_gap: post_trial_gap
+  };
+  timeline.push(instructions);
+
+  /* define trial stimuli array for timeline variables */
+  var test_stimuli = [
+    { stimulus: left_key_img, correct_response: 'f' },
+    { stimulus: right_key_img, correct_response: 'j' }
+  ];
+
+  /* define fixation screen */
+  var fixation = {
+    type: jsPsychHtmlKeyboardResponse,
+    stimulus: '<div style="font-size:66px;">+</div>',
+    choices: "NO_KEYS",
+    trial_duration: function () {
+      return jsPsych.randomization.sampleWithoutReplacement([250, 500, 750, 1000, 1250, 1500, 1750, 2000], 1)[0];
+    },
+    data: {
+      task: 'fixation'
+    }
+  };
+
+  /* define a trial */
+  var test = {
+    type: jsPsychImageKeyboardResponse,
+    stimulus: jsPsych.timelineVariable('stimulus'),
+    choices: ['f', 'j'],
+    data: {
+      task: 'response',
+      correct_response: jsPsych.timelineVariable('correct_response')
+    },
+    on_finish: function (data) {
+      data.correct = jsPsych.pluginAPI.compareKeys(data.response, data.correct_response);
+    }
+  };
+
+  /* define test procedure */
+  var test_procedure = {
+    timeline: [fixation, test],
+    timeline_variables: test_stimuli,
+    repetitions: n_block_reps,
+    randomize_order: true
+  };
+  timeline.push(test_procedure);
+
+  /* define debrief */
+  var debrief_block = {
+    type: jsPsychHtmlKeyboardResponse,
+    stimulus: function () {
+
+      var trials = jsPsych.data.get().filter({ task: 'response' });
+      var correct_trials = trials.filter({ correct: true });
+      var accuracy = Math.round(correct_trials.count() / trials.count() * 100);
+      var rt = Math.round(correct_trials.select('rt').mean());
+
+      return `<p>You responded correctly on ${accuracy}% of the trials.</p>
+          <p>Your average response time was ${rt}ms.</p>
+          <p>Press any key to complete the experiment and view your data (in csv format). Thank you!</p>`;
+
+    }
+  };
+  timeline.push(debrief_block);
+
+  /* start the experiment */
+  jsPsych.run(timeline);
+
+</script>
+
+</html>
