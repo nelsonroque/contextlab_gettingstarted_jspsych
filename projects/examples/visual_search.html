@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <title>Visual Search | Context Lab</title>
+  <script src="../../dist/jspsych.js"></script>
+  <script src="../../dist/plugin-html-keyboard-response.js"></script>
+  <script src="../../dist/plugin-html-button-response.js"></script>
+  <script src="../../dist/plugin-image-keyboard-response.js"></script>
+  <script src="../../dist/plugin-visual-search-circle.js"></script>
+  <script src="../../dist/plugin-instructions.js"></script>
+  <script src="../../dist/plugin-preload.js"></script>
+  <link href="../../dist/jspsych.css" rel="stylesheet" type="text/css" />
+  <script src="../../utils.js"></script>
+
+  <!-- Custom styling to enhance readability -->
+  <link href="../../app.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body></body>
+<script>
+
+  // set image for each key
+  var img1 = "img/cat.png";
+  var img2 = "img/tyrannosaurus-rex.png";
+
+  // set timing parameters
+  var post_trial_gap = 1200;
+
+  // specify instruction image size
+  var img_width = 120;
+  var img_height = 120;
+
+  // number of blocks
+  n_block_reps = 3;
+
+  /* initialize jsPsych */
+  var jsPsych = initJsPsych({
+    on_finish: function () {
+      jsPsych.data.displayData("csv");
+    }
+  });
+
+  /* create timeline */
+  var timeline = [];
+
+  /* preload images */
+  var preload = {
+    type: jsPsychPreload,
+    images: ['img/cat.png', 'img/tyrannosaurus-rex.png']
+  };
+  timeline.push(preload);
+
+  var instructions = {
+    type: jsPsychInstructions,
+    pages: [
+    'Welcome to a demo Target Present/Absent experiment. Click next to begin.',
+    'Press E if there is an dinosaur in the group.',
+    'Press N if there is no dinosaur in the group.',
+    'Press any key to begin'
+    ],
+    button_label_next: "Continue",
+    button_label_previous: "Return to the dark side",
+    show_clickable_nav: true
+}
+  timeline.push(instructions);
+
+  var trial_pres_sm = {
+    type: jsPsychVisualSearchCircle,
+    stimuli: [img1, img2, img1, img1, img1, img1],
+    fixation_image: 'img/fixation.png',
+    target_present_key: 'e',
+    target_absent_key: 'n',
+    target_present: true,
+    fixation_size: [50,50],
+    target_size: [60,60],
+    circle_diameter: 300
+  }
+
+  var trial_abs_sm = {
+    type: jsPsychVisualSearchCircle,
+    stimuli: [img1, img1, img1, img1, img1, img1],
+    fixation_image: 'img/fixation.png',
+    target_present_key: 'e',
+    target_absent_key: 'n',
+    target_present: true,
+    fixation_size: [50,50],
+    target_size: [60,60],
+    circle_diameter: 300
+  }
+
+  var trial_pres_lg = {
+    type: jsPsychVisualSearchCircle,
+    stimuli: [img1, img2, img1, img1, img1, img1],
+    fixation_image: 'img/fixation.png',
+    target_present_key: 'e',
+    target_absent_key: 'n',
+    target_present: true,
+    fixation_size: [50,50],
+    target_size: [60,60],
+    circle_diameter: 600
+  }
+
+  var trial_abs_lg = {
+    type: jsPsychVisualSearchCircle,
+    stimuli: [img1, img1, img1, img1, img1, img1],
+    fixation_image: 'img/fixation.png',
+    target_present_key: 'e',
+    target_absent_key: 'n',
+    target_present: true,
+    fixation_size: [50,50],
+    target_size: [60,60],
+    circle_diameter: 600
+  }
+
+  /* define test procedure */
+  var test_procedure = {
+    timeline: [trial_pres_sm, trial_pres_lg, trial_abs_sm, trial_abs_lg],
+    repetitions: n_block_reps,
+    randomize_order: true
+  };
+  timeline.push(test_procedure);
+
+  /* define debrief */
+  var debrief_block = {
+    type: jsPsychHtmlKeyboardResponse,
+    stimulus: function () {
+
+      var trials = jsPsych.data.get().filter({ task: 'response' });
+      var correct_trials = trials.filter({ correct: true });
+      var accuracy = Math.round(correct_trials.count() / trials.count() * 100);
+      var rt = Math.round(correct_trials.select('rt').mean());
+
+      return `<p>You responded correctly on ${accuracy}% of the trials.</p>
+          <p>Your average response time was ${rt}ms.</p>
+          <p>Press any key to complete the experiment and view your data (in csv format). Thank you!</p>`;
+
+    }
+  };
+  timeline.push(debrief_block);
+
+  /* start the experiment */
+  jsPsych.run(timeline);
+
+</script>
+
+</html>
