@@ -1,6 +1,8 @@
 # Context Lab: Getting Started with JsPsych
  A repository with materials to get started creating JsPsych experiments.
 
+This repository is deployed at: [https://main.d218kdke0kc6mg.amplifyapp.com/](https://main.d218kdke0kc6mg.amplifyapp.com/)
+
 ## Why use JsPsych?
 Simple answer: don't repeat yourself (DRY) when you code. JsPsych, like other programming frameworks, have sets of boilerplate code that make it easy to get started programming an experience, without having to 'reinvent the wheel'.
 
