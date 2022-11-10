@@ -20,7 +20,7 @@
   <body></body>
   <script>
     // set image for each key
-  var img1 = "img/cat.png";
+  var img1 = "img/CalcCalc-victre_11_4_2-DICOM_dm_1_1656987224-001croparea_(1000_750_1512_1262).jpg";
   var img2 = "img/tyrannosaurus-rex.png";
 
 
@@ -57,6 +57,10 @@
       render_on_canvas: false,
       choices: "NO_KEYS",
       trial_duration: 1000,
+      // on_finish: function (data) {
+      //   jsPsych.extensions.webgazer.showPredictions();
+      //   jsPsych.extensions.webgazer.showVideo();
+      // },
       extensions: [
         {
           type: jsPsychExtensionWebgazer, 
@@ -64,6 +68,28 @@
         }
       ]
     };
+
+    // var trial2 = {
+    //   type: jsPsychImageKeyboardResponse,
+    //   stimulus: "",
+    //   render_on_canvas: false,
+    //   choices: "NO_KEYS",
+    //   trial_duration: 1000,
+    //   on_start: function (data) {
+    //     jsPsych.extensions.webgazer.showPredictions();
+    //     jsPsych.extensions.webgazer.showVideo();
+    //   },
+    //   on_finish: function (data) {
+    //     jsPsych.extensions.webgazer.showPredictions();
+    //     jsPsych.extensions.webgazer.showVideo();
+    //   },
+    //   extensions: [
+    //     {
+    //       type: jsPsychExtensionWebgazer, 
+    //       params: {targets: ['#jspsych-image-keyboard-response-stimulus']}
+    //     }
+    //   ]
+    // };
 
     jsPsych.run([preload, init_camera, calibration, start, trial]);
     
